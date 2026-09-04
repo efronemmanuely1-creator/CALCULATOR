@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Smart Calculator</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            color: #222;
+            text-align: center;
+            transition: 0.3s;
+        }
+
+        .app-header {
+            margin: 20px 0;
+        }
+
+        .app-title {
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .app-subtitle {
+            margin-top: 5px;
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .dark-mode-btn {
+            width: auto;
+            height: 40px;
+            padding: 0 15px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 8px;
+            background: #333;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .dark-mode-btn:hover {
+            opacity: 0.85;
+        }
+
+        .calculator {
+            width: 100%;
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        #display {
+            width: 100%;
+            height: 65px;
+            padding: 5px 12px;
+            margin-bottom: 15px;
+
+            border: 1px solid #ccc;
+            border-radius: 10px;
+
+            background: #fafafa;
+            color: #222;
+
+            font-size: 27px;
+            text-align: right;
+
+            outline: none;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        button {
+            height: 52px;
+            border: none;
+            border-radius: 9px;
+
+            background: #e9e9e9;
+            color: #222;
+
+            font-size: 18px;
+            cursor: pointer;
+
+            transition: 0.15s;
+        }
+
+        button:hover {
+            opacity: 0.85;
+            transform: scale(1.03);
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
+        .operator {
+            background: #2196F3;
+            color: white;
+        }
+
+        .clear {
+            background: #f44336;
+            color: white;
+        }
+
+        .delete {
+            background: #ff9800;
+            color: white;
+        }
+
+        .equal {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .scientific {
+            background: #673AB7;
+            color: white;
+        }
+
+        .memory {
+            background: #607D8B;
+            color: white;
+        }
+
+        .special {
+            background: #795548;
+            color: white;
+        }
+
+        .history {
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+
+            background: white;
+            border-radius: 15px;
+
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+
+            text-align: left;
+        }
+
+        .history h2 {
+            margin-top: 0;
+            text-align: center;
+            font-size: 20px;
+        }
+
+        .clear-history {
+            width: 100%;
+            height: 40px;
+            margin-bottom: 10px;
+
+            background: #f44336;
+            color: white;
+
+            font-size: 15px;
+        }
+
+        .history-item {
+            padding: 10px;
+            margin-bottom: 5px;
+
+            border-bottom: 1px solid #ddd;
+
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .history-item:hover {
+            background: #f2f2f2;
+        }
+
+        .history-item small {
+            font-size: 11px;
+            opacity: 0.6;
+        }
+
+        .no-history {
+            text-align: center;
+            opacity: 0.6;
+            padding: 10px;
+        }
+
+
+        /* =========================
+           DARK MODE
+        ========================= */
+
+        .dark-mode {
+            background: #181818;
+            color: white;
+        }
+
+        .dark-mode .calculator,
+        .dark-mode .history {
+            background: #292929;
+        }
+
+        .dark-mode #display {
+            background: #111;
+            color: white;
+            border-color: #555;
+        }
+
+        .dark-mode button:not(.operator):not(.clear):not(.delete):not(.equal):not(.scientific):not(.memory):not(.special) {
+            background: #444;
+            color: white;
+        }
+
+        .dark-mode .history-item {
+            border-color: #555;
+        }
+
+        .dark-mode .history-item:hover {
+            background: #3b3b3b;
+        }
+
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 450px) {
+
+            body {
+                padding: 10px;
+            }
+
+            .app-title {
+                font-size: 23px;
+            }
+
+            .calculator {
+                padding: 12px;
+            }
+
+            button {
+                height: 48px;
+                font-size: 16px;
+            }
+
+            #display {
+                height: 60px;
+                font-size: 23px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+
+    <!-- APP HEADER -->
+
+    <div class="app-header">
+
+        <div class="app-title">
+            🧮 Smart Calculator
+        </div>
+
+        <div class="app-subtitle">
+            Simple • Fast • Accurate
+        </div>
+
+    </div>
+
+
+    <!-- DARK MODE -->
+
+    <button
+        class="dark-mode-btn"
+        onclick="toggleDarkMode()"
+    >
+        🌙 Dark Mode
+    </button>
+
+
+    <!-- CALCULATOR -->
+
+    <div class="calculator">
+
+        <input
+            type="text"
+            id="display"
+            value="0"
+            readonly
+        >
+
+
+        <div class="button-grid">
+
+
+            <!-- ROW 1 -->
+
+            <button onclick="percentage()">
+                %
+            </button>
+
+            <button onclick="addParenthesis('(')">
+                    (
+            </button>
+
+            <button onclick="addParenthesis(')')">
+                    )
+            </button>
+            <button onclick="toggleSign()">
+                ±
+            </button>
+
+            <button
+                class="clear"
+                onclick="clearDisplay()"
+            >
+                C
+            </button>
+
+            <button
+                class="delete"
+                onclick="deleteNumber()"
+            >
+                DEL
+            </button>
+
+
+            <!-- ROW 2 -->
+
+            <button onclick="addNumber(7)">
+                7
+            </button>
+
+            <button onclick="addNumber(8)">
+                8
+            </button>
+
+            <button onclick="addNumber(9)">
+                9
+            </button>
+
+            <button
+                class="operator"
+                onclick="addOperator('/')"
+            >
+                ÷
+            </button>
+
+
+            <!-- ROW 3 -->
+
+            <button onclick="addNumber(4)">
+                4
+            </button>
+
+            <button onclick="addNumber(5)">
+                5
+            </button>
+
+            <button onclick="addNumber(6)">
+                6
+            </button>
+
+            <button
+                class="operator"
+                onclick="addOperator('*')"
+            >
+                ×
+            </button>
+
+
+            <!-- ROW 4 -->
+
+            <button onclick="addNumber(1)">
+                1
+            </button>
+
+            <button onclick="addNumber(2)">
+                2
+            </button>
+
+            <button onclick="addNumber(3)">
+                3
+            </button>
+
+            <button
+                class="operator"
+                onclick="addOperator('-')"
+            >
+                -
+            </button>
+
+
+            <!-- ROW 5 -->
+
+            <button onclick="addNumber(0)">
+                0
+            </button>
+
+            <button onclick="addDecimal()">
+                .
+            </button>
+
+            <button
+                class="equal"
+                onclick="calculate()"
+            >
+                =
+            </button>
+
+            <button
+                class="operator"
+                onclick="addOperator('+')"
+            >
+                +
+            </button>
+
+
+            <!-- MEMORY -->
+
+            <button
+                class="memory"
+                onclick="memoryAdd()"
+            >
+                M+
+            </button>
+
+            <button
+                class="memory"
+                onclick="memorySubtract()"
+            >
+                M−
+            </button>
+
+            <button
+                class="memory"
+                onclick="memoryRecall()"
+            >
+                MR
+            </button>
+
+            <button
+                class="memory"
+                onclick="memoryClear()"
+            >
+                MC
+            </button>
+
+
+            <!-- SPECIAL -->
+
+            <button
+                class="special"
+                onclick="lastAnswer()"
+            >
+                ANS
+            </button>
+
+            <button
+                class="special"
+                onclick="squareRoot()"
+            >
+                √
+            </button>
+
+            <button
+                class="special"
+                onclick="squareNumber()"
+            >
+                x²
+            </button>
+
+            <button
+                class="special"
+                onclick="powerNumber()"
+            >
+                xʸ
+            </button>
+
+
+            <!-- SCIENTIFIC -->
+
+            <button
+                class="scientific"
+                onclick="calculateSin()"
+            >
+                sin
+            </button>
+
+            <button
+                class="scientific"
+                onclick="calculateCos()"
+            >
+                cos
+            </button>
+
+            <button
+                class="scientific"
+                onclick="calculateTan()"
+            >
+                tan
+            </button>
+
+            <button
+                class="scientific"
+                onclick="calculateLog()"
+            >
+                log
+            </button>
+
+
+            <button
+                class="scientific"
+                onclick="calculateLn()"
+            >
+                ln
+            </button>
+
+            <button
+                class="scientific"
+                onclick="insertPi()"
+            >
+                π
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- HISTORY -->
+
+    <div class="history">
+
+        <h2>
+            Calculation History
+        </h2>
+
+        <button
+            class="clear-history"
+            onclick="clearHistory()"
+        >
+            Clear History
+        </button>
+
+        <div id="historyList"></div>
+
+    </div>
+
+
+<script>
+
+
+/* =========================================================
+   GLOBAL VARIABLES
+========================================================= */
+
+let history =
+    JSON.parse(
+        localStorage.getItem("calculatorHistory")
+    ) || [];
+
+
+let memory =
+    Number(
+        localStorage.getItem("calculatorMemory")
+    ) || 0;
+
+
+let answer =
+    Number(
+        localStorage.getItem("lastAnswer")
+    ) || 0;
+
+
+/* =========================================================
+   GET DISPLAY
+========================================================= */
+
+function getDisplay() {
+
+    return document.getElementById("display");
+
+}
+
+
+/* =========================================================
+   ADD NUMBER
+========================================================= */
+
+function addNumber(number) {
+
+    let display = getDisplay();
+
+    if (
+        display.value === "0" ||
+        display.value === "Error" ||
+        display.value === "Invalid calculation" ||
+        display.value === "Cannot divide by zero"
+    ) {
+
+        display.value = number;
+
+    } else {
+
+        display.value += number;
+
+    }
+
+}
+
+
+/* =========================================================
+   ADD OPERATOR
+========================================================= */
+
+function addOperator(operator) {
+
+    let display = getDisplay();
+
+    let value = display.value;
+
+    if (
+        value === "Error" ||
+        value === "Invalid calculation" ||
+        value === "Cannot divide by zero"
+    ) {
+
+        display.value = "0";
+
+        return;
+
+    }
+
+
+    /*
+       Don't allow two operators
+       next to each other.
+    */
+
+    if (/[+\-×÷]$/.test(value)) {
+
+        return;
+
+    }
+
+
+    /*
+       Don't allow operator immediately
+       after empty display.
+    */
+
+    if (value === "") {
+
+        return;
+
+    }
+
+
+    if (operator === "*") {
+
+        display.value += "×";
+
+    }
+
+    else if (operator === "/") {
+
+        display.value += "÷";
+
+    }
+
+    else {
+
+        display.value += operator;
+
+    }
+
+}
+
+
+/* =========================================================
+   DECIMAL
+========================================================= */
+
+function addDecimal() {
+
+    let display = getDisplay();
+
+    let value = display.value;
+
+
+    /*
+       Get the current number after
+       the latest operator.
+    */
+
+    let parts =
+        value.split(/[+\-×÷]/);
+
+    let currentNumber =
+        parts[parts.length - 1];
+
+
+    if (!currentNumber.includes(".")) {
+
+        display.value += ".";
+
+    }
+
+}
+
+
+/* =========================================================
+   CALCULATE
+========================================================= */
+
+function calculate() {
+    let display = getDisplay();
+    let originalExpression = display.value.trim();
+
+    if (originalExpression === "") {
+        return;
+    }
+
+    if (/[+\-×÷.]$/.test(originalExpression)) {
+        display.value = "Invalid calculation";
+        return;
+    }
+
+    try {
+
+        let result = safeCalculate(originalExpression);
+
+        if (!isFinite(result)) {
+            display.value = "Cannot divide by zero";
+            return;
+        }
+
+        result = formatResult(result);
+
+        display.value = result;
+
+        answer = result;
+        localStorage.setItem("lastAnswer", answer);
+
+        addHistory(originalExpression, result);
+
+    }
+    catch (error) {
+
+        if (error.message === "Cannot divide by zero") {
+            display.value = "Cannot divide by zero";
+        }
+        else {
+            display.value = "Invalid calculation";
+        }
+
+    }
+}
+function safeCalculate(expression) {
+
+    expression = expression.replace(/\s+/g, "");
+
+    expression = expression
+        .replace(/×/g, "*")
+        .replace(/÷/g, "/");
+
+    // Allow only numbers, operators,
+    // decimal points and parentheses
+    if (!/^[0-9+\-*/().]+$/.test(expression)) {
+
+        throw new Error("Invalid characters");
+
+    }
+
+    // Check balanced parentheses
+    let balance = 0;
+
+    for (let char of expression) {
+
+        if (char === "(") {
+            balance++;
+        }
+
+        else if (char === ")") {
+            balance--;
+
+            if (balance < 0) {
+                throw new Error("Invalid parentheses");
+            }
+        }
+
+    }
+
+    if (balance !== 0) {
+        throw new Error("Invalid parentheses");
+    }
+
+    return parseExpression(expression);
+
+}
+
+
+function parseExpression(expression) {
+
+    // Solve parentheses first
+    while (expression.includes("(")) {
+
+        let closeIndex =
+            expression.indexOf(")");
+
+        if (closeIndex === -1) {
+
+            throw new Error("Invalid parentheses");
+
+        }
+
+        let openIndex =
+            expression.lastIndexOf(
+                "(",
+                closeIndex
+            );
+
+        let inside =
+            expression.substring(
+                openIndex + 1,
+                closeIndex
+            );
+
+        if (inside === "") {
+
+            throw new Error("Empty parentheses");
+
+        }
+
+        let result =
+            parseSimpleExpression(inside);
+
+        expression =
+            expression.substring(
+                0,
+                openIndex
+            )
+            +
+            result
+            +
+            expression.substring(
+                closeIndex + 1
+            );
+
+    }
+
+    return parseSimpleExpression(expression);
+
+}
+function parseSimpleExpression(expression) {
+
+    let numbers = [];
+    let operators = [];
+    let number = "";
+
+    for (let i = 0; i < expression.length; i++) {
+
+        let char = expression[i];
+
+        // Read numbers and decimal points
+        if (
+            (char >= "0" && char <= "9") ||
+            char === "."
+        ) {
+
+            number += char;
+
+        }
+
+        // Read operators
+        else if (
+            char === "+" ||
+            char === "-" ||
+            char === "*" ||
+            char === "/"
+        ) {
+
+            // Operator cannot come before a number
+            if (number === "") {
+
+                throw new Error("Invalid expression");
+
+            }
+
+            let parsedNumber = Number(number);
+
+            if (isNaN(parsedNumber)) {
+
+                throw new Error("Invalid number");
+
+            }
+
+            numbers.push(parsedNumber);
+
+            number = "";
+
+            operators.push(char);
+
+        }
+
+        else {
+
+            throw new Error("Invalid expression");
+
+        }
+
+    }
+
+
+    // Add the last number
+    if (number !== "") {
+
+        let parsedNumber = Number(number);
+
+        if (isNaN(parsedNumber)) {
+
+            throw new Error("Invalid number");
+
+        }
+
+        numbers.push(parsedNumber);
+
+    }
+
+
+    // Check expression structure
+    if (
+        numbers.length === 0 ||
+        numbers.length !== operators.length + 1
+    ) {
+
+        throw new Error("Invalid expression");
+
+    }
+
+
+    // ==========================================
+    // MULTIPLICATION AND DIVISION FIRST
+    // ==========================================
+
+    for (let i = 0; i < operators.length; ) {
+
+        if (
+            operators[i] === "*" ||
+            operators[i] === "/"
+        ) {
+
+            let left = numbers[i];
+            let right = numbers[i + 1];
+
+            let result;
+
+
+            // Division by zero
+            if (
+                operators[i] === "/" &&
+                right === 0
+            ) {
+
+                throw new Error(
+                    "Cannot divide by zero"
+                );
+
+            }
+
+
+            if (operators[i] === "*") {
+
+                result = left * right;
+
+            } else {
+
+                result = left / right;
+
+            }
+
+
+            // Replace the two numbers with result
+            numbers.splice(
+                i,
+                2,
+                result
+            );
+
+
+            // Remove operator
+            operators.splice(
+                i,
+                1
+            );
+
+        }
+
+        else {
+
+            i++;
+
+        }
+
+    }
+
+
+    // ==========================================
+    // ADDITION AND SUBTRACTION
+    // ==========================================
+
+    let result = numbers[0];
+
+    for (
+        let i = 0;
+        i < operators.length;
+        i++
+    ) {
+
+        if (operators[i] === "+") {
+
+            result += numbers[i + 1];
+
+        }
+
+        else if (operators[i] === "-") {
+
+            result -= numbers[i + 1];
+
+        }
+
+    }
+
+
+    return result;
+
+}
+/* =========================================================
+   FORMAT RESULT
+========================================================= */
+
+function formatResult(result) {
+
+    return Number(
+        result.toFixed(10)
+    );
+
+}
+
+
+/* =========================================================
+   DELETE
+========================================================= */
+
+function deleteNumber() {
+
+    let display = getDisplay();
+
+    display.value =
+        display.value.slice(0, -1);
+
+
+    if (display.value === "") {
+
+        display.value = "0";
+
+    }
+
+}
+
+
+/* =========================================================
+   CLEAR DISPLAY
+========================================================= */
+
+function clearDisplay() {
+
+    getDisplay().value = "0";
+
+}
+
+
+/* =========================================================
+   PERCENTAGE
+========================================================= */
+
+function percentage() {
+
+    let display = getDisplay();
+
+    let value =
+        Number(display.value);
+
+
+    if (isNaN(value)) {
+
+        display.value = "Error";
+
+        return;
+
+    }
+
+
+    let result =
+        value / 100;
+
+
+    result =
+        formatResult(result);
+
+
+    display.value = result;
+
+    answer = result;
+
+    localStorage.setItem(
+        "lastAnswer",
+        answer
+    );
+
+}
+
+
+/* =========================================================
+   PLUS / MINUS
+========================================================= */
+
+function toggleSign() {
+
+    let display = getDisplay();
+
+    let value =
+        Number(display.value);
+
+
+    if (isNaN(value)) {
+
+        display.value = "Error";
+
+        return;
+
+    }
+
+
+    display.value =
+        formatResult(value * -1);
+
+}
+
+
+/* =========================================================
+   MEMORY ADD
+========================================================= */
+
+function memoryAdd() {
+
+    let value =
+        Number(getDisplay().value);
+
+
+    if (isNaN(value)) {
+
+        return;
+
+    }
+
+
+    memory += value;
+
+
+    localStorage.setItem(
+        "calculatorMemory",
+        memory
+    );
+
+}
+
+
+/* =========================================================
+   MEMORY SUBTRACT
+========================================================= */
+
+function memorySubtract() {
+
+    let value =
+        Number(getDisplay().value);
+
+
+    if (isNaN(value)) {
+
+        return;
+
+    }
+
+
+    memory -= value;
+
+
+    localStorage.setItem(
+        "calculatorMemory",
+        memory
+    );
+
+}
+
+
+/* =========================================================
+   MEMORY RECALL
+========================================================= */
+
+function memoryRecall() {
+
+    getDisplay().value =
+        formatResult(memory);
+
+}
+
+
+/* =========================================================
+   MEMORY CLEAR
+========================================================= */
+
+function memoryClear() {
+
+    memory = 0;
+
+    localStorage.removeItem(
+        "calculatorMemory"
+    );
+
+}
+
+
+/* =========================================================
+   LAST ANSWER
+========================================================= */
+
+function lastAnswer() {
+
+    getDisplay().value =
+        formatResult(answer);
+
+}
+
+
+/* =========================================================
+   SQUARE ROOT
+========================================================= */
+
+function squareRoot() {
+
+    let value =
+        Number(getDisplay().value);
+
+
+    if (isNaN(value) || value < 0) {
+
+        getDisplay().value = "Error";
+
+        return;
+
+    }
+
+
+    let result =
+        Math.sqrt(value);
+
+
+    result =
+        formatResult(result);
+
+
+    getDisplay().value = result;
+
+    answer = result;
+
+    localStorage.setItem(
+        "lastAnswer",
+        answer
+    );
+
+}
+
+
+/* =========================================================
+   SQUARE
+========================================================= */
+
+function squareNumber() {
+
+    let value =
+        Number(getDisplay().value);
+
+
+    if (isNaN(value)) {
+
+        getDisplay().value = "Error";
+
+        return;
+
+    }
+
+
+    let result =
+        value * value;
+
+
+    result =
+        formatResult(result);
+
+
+    getDisplay().value = result;
+
+    answer = result;
+
+    localStorage.setItem(
+        "lastAnswer",
+        answer
+    );
+
+}
+
+
+/* =========================================================
+   POWER
+========================================================= */
+
+function powerNumber() {
+
+    let base =
+        Number(getDisplay().value);
+
+
+    if (isNaN(base)) {
+
+        getDisplay().value = "Error";
+
+        return;
+
+    }
+
+
+    let exponent =
+        prompt("Enter power:");
+
+
+    if (
+        exponent === null ||
+        exponent.trim() === "" ||
+        isNaN(exponent)
+    ) {
+
+        return;
+
+    }
+
+
+    let result =
+        Math.pow(
+            base,
+            Number(exponent)
+        );
+
+
+    if (!isFinite(result)) {
+
+        getDisplay().value = "Error";
+
+        return;
+
+    }
+
+
+    result =
+        formatResult(result);
+
+
+    getDisplay().value = result;
+
+    answer = result;
+
+    localStorage.setItem(
+        "lastAnswer",
+        answer
+    );
+
+}
+
+
+/* =========================================================
+   SIN
+========================================================= */
+
+function calculateSin() {
+
+    let degree =
+        Number(getDisplay().value);
+
+
+    if (isNaN(degree)) {
+
+        getDisplay().value = "Error";
+
+        return;
+
+    }
+
+
+    let radian =
+        degree *
+        (Math.PI / 180);
+
+
+    let result =
+        Math.sin(radian);
+
+
+    result =
+        formatResult(result);
+
+
+    getDisplay().value = result;
+
+    answer = result;
+
+    localStorage.setItem(
+        "lastAnswer",
+        answer
+    );
+
+}
+
+
+/* =========================================================
+   COS
+========================================================= */
+
+function calculateCos() {
+
+    let degree =
+        Number(getDisplay().value);
+
+
+    if (isNaN(degree)) {
+
+        getDisplay().value = "Error";
+
+        return;
+
+    }
+
+
+    let radian =
+        degree *
+        (Math.PI / 180);
+
+
+    let result =
+        Math.cos(radian);
+
+
+    result =
+        formatResult(result);
+
+
+    getDisplay().value = result;
+
+    answer = result;
+
+    localStorage.setItem(
+        "lastAnswer",
+        answer
+    );
+
+}
+
+
+/* =========================================================
+   TAN
+========================================================= */
+
+function calculateTan() {
+
+    let degree =
+        Number(getDisplay().value);
+
+
+    if (isNaN(degree)) {
+
+        getDisplay().value = "Error";
+
+        return;
+
+    }
+
+
+    /*
+       TAN is undefined at 90 + 180n degrees.
+    */
+
+    let normalized =
+        ((degree % 180) + 180) % 180;
+
+
+    if (
+        Math.abs(normalized - 90) < 0.0000001
+    ) {
+
+        getDisplay().value =
+            "Undefined";
+
+        return;
+
+    }
+
+
+    let radian =
+        degree *
+        (Math.PI / 180);
+
+
+    let result =
+        Math.tan(radian);
+
+
+    result =
+        formatResult(result);
+
+
+    getDisplay().value = result;
+
+    answer = result;
+
+    localStorage.setItem(
+        "lastAnswer",
+        answer
+    );
+
+}
+
+
+/* =========================================================
+   LOG
+========================================================= */
+
+function calculateLog() {
+
+    let value =
+        Number(getDisplay().value);
+
+
+    if (isNaN(value) || value <= 0) {
+
+        getDisplay().value = "Error";
+
+        return;
+
+    }
+
+
+    let result =
+        Math.log10(value);
+
+
+    result =
+        formatResult(result);
+
+
+    getDisplay().value = result;
+
+    answer = result;
+
+    localStorage.setItem(
+        "lastAnswer",
+        answer
+    );
+
+}
+
+
+/* =========================================================
+   LN
+========================================================= */
+
+function calculateLn() {
+
+    let value =
+        Number(getDisplay().value);
+
+
+    if (isNaN(value) || value <= 0) {
+
+        getDisplay().value = "Error";
+
+        return;
+
+    }
+
+
+    let result =
+        Math.log(value);
+
+
+    result =
+        formatResult(result);
+
+
+    getDisplay().value = result;
+
+    answer = result;
+
+    localStorage.setItem(
+        "lastAnswer",
+        answer
+    );
+
+}
+
+
+/* =========================================================
+   PI
+========================================================= */
+
+function insertPi() {
+
+    getDisplay().value =
+        formatResult(Math.PI);
+
+}
+
+
+/* =========================================================
+   HISTORY
+========================================================= */
+
+function addHistory(
+    calculation,
+    result
+) {
+
+    let historyItem = {
+
+        calculation:
+            calculation +
+            " = " +
+            result,
+
+        date:
+            new Date().toLocaleString()
+
+    };
+
+
+    history.push(historyItem);
+
+
+    /*
+       Keep only the latest 50
+       calculations.
+    */
+
+    if (history.length > 50) {
+
+        history =
+            history.slice(-50);
+
+    }
+
+
+    localStorage.setItem(
+        "calculatorHistory",
+        JSON.stringify(history)
+    );
+
+
+    showHistory();
+
+}
+
+
+/* =========================================================
+   SHOW HISTORY
+========================================================= */
+
+function showHistory() {
+
+    let historyList =
+        document.getElementById(
+            "historyList"
+        );
+
+
+    historyList.innerHTML = "";
+
+
+    if (history.length === 0) {
+
+        historyList.innerHTML =
+            '<div class="no-history">No calculations yet.</div>';
+
+        return;
+
+    }
+
+
+    history
+        .slice()
+        .reverse()
+        .forEach(function(item) {
+
+            let div =
+                document.createElement("div");
+
+
+            div.className =
+                "history-item";
+
+
+            let strong =
+                document.createElement("strong");
+
+
+            strong.textContent =
+                item.calculation;
+
+
+            let br =
+                document.createElement("br");
+
+
+            let small =
+                document.createElement("small");
+
+
+            small.textContent =
+                item.date;
+
+
+            div.appendChild(strong);
+
+            div.appendChild(br);
+
+            div.appendChild(small);
+
+
+            div.onclick =
+                function() {
+
+                    recallHistory(
+                        item.calculation
+                    );
+
+                };
+
+
+            historyList.appendChild(div);
+
+        });
+
+}
+
+
+/* =========================================================
+   RECALL HISTORY
+========================================================= */
+
+function recallHistory(calculation) {
+
+    let parts =
+        calculation.split("=");
+
+
+    if (parts.length < 2) {
+
+        return;
+
+    }
+
+
+    let result =
+        parts[parts.length - 1]
+            .trim();
+
+
+    getDisplay().value =
+        result;
+
+}
+
+
+/* =========================================================
+   CLEAR HISTORY
+========================================================= */
+
+function clearHistory() {
+
+    history = [];
+
+
+    localStorage.removeItem(
+        "calculatorHistory"
+    );
+
+
+    showHistory();
+
+}
+
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+function toggleDarkMode() {
+
+    document.body.classList.toggle(
+        "dark-mode"
+    );
+
+
+    if (
+        document.body.classList.contains(
+            "dark-mode"
+        )
+    ) {
+
+        localStorage.setItem(
+            "theme",
+            "dark"
+        );
+
+    }
+
+    else {
+
+        localStorage.setItem(
+            "theme",
+            "light"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   LOAD DARK MODE
+========================================================= */
+
+if (
+    localStorage.getItem("theme")
+    ===
+    "dark"
+) {
+
+    document.body.classList.add(
+        "dark-mode"
+    );
+
+}
+
+
+/* =========================================================
+   KEYBOARD SUPPORT
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        let key =
+            event.key;
+
+
+        /* Numbers */
+
+        if (
+            key >= "0" &&
+            key <= "9"
+        ) {
+
+            addNumber(key);
+
+        }
+
+
+        /* Operators */
+
+        else if (key === "+") {
+
+            addOperator("+");
+
+        }
+
+        else if (key === "-") {
+
+            addOperator("-");
+
+        }
+
+        else if (key === "*") {
+
+            addOperator("*");
+
+        }
+
+        else if (key === "/") {
+
+            event.preventDefault();
+
+            addOperator("/");
+
+        }
+
+
+        /* Decimal */
+
+        else if (key === ".") {
+
+            addDecimal();
+
+        }
+
+
+        /* Enter */
+
+        else if (
+            key === "Enter" ||
+            key === "="
+        ) {
+
+            calculate();
+
+        }
+
+
+        /* Backspace */
+
+        else if (key === "Backspace") {
+
+            event.preventDefault();
+
+            deleteNumber();
+
+        }
+
+
+        /* Escape */
+
+        else if (key === "Escape") {
+
+            clearDisplay();
+
+        }
+
+    }
+);
+
+/* =========================================================
+   START APPLICATION
+========================================================= */
+
+showHistory();
+
+function addParenthesis(parenthesis) {
+
+    let display = getDisplay();
+
+    let value = display.value;
+
+
+    if (
+        value === "0" ||
+        value === "Error" ||
+        value === "Invalid calculation" ||
+        value === "Cannot divide by zero"
+    ) {
+
+        if (parenthesis === "(") {
+
+            display.value = "(";
+
+        }
+
+        return;
+
+    }
+
+
+    display.value += parenthesis;
+
+}
+
+</script>
+
+</body>
+</html>
